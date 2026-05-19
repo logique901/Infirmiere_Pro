@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email == 'logique901@gmail.com' && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Training Config
+    match /config/training {
+      allow read: if true; // Publicly readable training content
+      allow write: if isAdmin();
+    }
+
+    // Quiz Questions
+    match /questions/{questionId} {
+      allow read: if true; // Public quiz questions
+      allow write: if isAdmin();
+    }
+
+    // Results (Certificates)
+    match /results/{resultId} {
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow write, delete: if false; // Certificates are immutable
+    }
+
+    // Admins (Self-protected or system-set)
+    match /admins/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if false; // Only manageable via console or specialized script
+    }
+  }
+}

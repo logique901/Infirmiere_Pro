@@ -1,0 +1,8 @@
+{
+  "name": "Infirmière Pro",
+  "description": "Plateforme de formation continue et certification pour les étudiants en soins infirmiers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

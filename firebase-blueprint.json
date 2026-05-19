@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "TrainingContent": {
+      "title": "Training Content",
+      "description": "The educational content of the training module",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "textContent": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "videoUrl", "textContent"]
+    },
+    "QuizQuestion": {
+      "title": "Quiz Question",
+      "description": "A single multiple-choice question for the evaluation",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "correctAnswer": { "type": "integer" },
+        "order": { "type": "integer" }
+      },
+      "required": ["text", "options", "correctAnswer", "order"]
+    },
+    "UserResult": {
+      "title": "User Result",
+      "description": "Data of a user who successfully completed the quiz",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "institution": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "uid": { "type": "string" }
+      },
+      "required": ["firstName", "lastName", "institution", "date", "uid"]
+    }
+  },
+  "firestore": {
+    "config/training": {
+      "schema": "TrainingContent",
+      "description": "Global training settings and content"
+    },
+    "questions": {
+      "schema": "QuizQuestion",
+      "description": "Collection of quiz questions"
+    },
+    "results": {
+      "schema": "UserResult",
+      "description": "Records of certifications issued"
+    }
+  }
+}
