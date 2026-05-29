@@ -20,11 +20,10 @@ import {
   Users,
   ArrowUp,
   ArrowDown,
-  FileDown,
-  XCircle
+  FileDown
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -84,7 +83,7 @@ const NavigationSteps = ({ currentStep }: { currentStep: Step }) => {
   ];
 
   return (
-    <div className="flex items-center justify-center space-x-2 md:space-x-8 mb-12 overflow-x-auto py-4">
+    <div className="flex items-center justify-start md:justify-center space-x-4 md:space-x-8 mb-12 overflow-x-auto py-4 scrollbar-hide">
       {steps.map((step, idx) => {
         const Icon = step.icon;
         const isActive = step.key === currentStep;
@@ -258,22 +257,22 @@ export default function App() {
 
     setIsDownloading(true);
     try {
-      // Ensure specific styles for capture
-      const canvas = await html2canvas(element, {
-        scale: 2, // Higher quality
-        useCORS: true,
-        logging: false,
+      const dataUrl = await htmlToImage.toPng(element, {
+        quality: 1.0,
+        pixelRatio: 2,
         backgroundColor: '#ffffff'
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
+      
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'px',
-        format: [canvas.width, canvas.height]
+        format: [width * 2, height * 2]
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.addImage(dataUrl, 'PNG', 0, 0, width * 2, height * 2);
       pdf.save(`Certificat-${userInfo.firstName}-${userInfo.lastName}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -306,7 +305,7 @@ export default function App() {
         onAdminClick={() => setStep('admin')}
       />
       
-      <main className="max-w-4xl mx-auto px-6 pb-20 pt-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 pt-6 sm:pt-10">
         {step !== 'admin' && <NavigationSteps currentStep={step} />}
 
         <AnimatePresence mode="wait">
@@ -450,17 +449,12 @@ function QuizModule({ onComplete, questions, onReview }: { onComplete: () => voi
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
-  const [quizState, setQuizState] = useState<'intro' | 'responding' | 'feedback' | 'result'>('intro');
+  const [quizState, setQuizState] = useState<'intro' | 'responding' | 'result'>('intro');
 
   const q = questions[currentIdx];
   const progress = ((currentIdx + (quizState === 'result' ? 1 : 0)) / questions.length) * 100;
 
-  const handleVerify = () => {
-    if (selected === null) return;
-    setQuizState('feedback');
-  };
-
-  const handleContinue = () => {
+  const handleNext = () => {
     if (selected === null) return;
     const newAnswers = [...answers, selected];
     setAnswers(newAnswers);
@@ -468,7 +462,6 @@ function QuizModule({ onComplete, questions, onReview }: { onComplete: () => voi
 
     if (currentIdx < questions.length - 1) {
       setCurrentIdx(currentIdx + 1);
-      setQuizState('responding');
     } else {
       setQuizState('result');
     }
@@ -617,57 +610,33 @@ function QuizModule({ onComplete, questions, onReview }: { onComplete: () => voi
       </div>
 
       <div className="space-y-3">
-        {q.options.map((opt, idx) => {
-          const isCorrect = idx === q.correctAnswer;
-          const isSelected = selected === idx;
-          const showCorrectHighlight = quizState === 'feedback' && isCorrect;
-          const showIncorrectHighlight = quizState === 'feedback' && isSelected && !isCorrect;
-
-          return (
-            <button
-              key={idx}
-              onClick={() => quizState === 'responding' && setSelected(idx)}
-              disabled={quizState === 'feedback'}
-              className={`w-full p-5 rounded-2xl text-left border-2 transition-all duration-200 flex items-center justify-center space-x-4 group h-full leading-snug ${
-                quizState === 'responding' && isSelected
-                  ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md transform -translate-y-0.5' 
-                  : showCorrectHighlight
-                  ? 'border-green-600 bg-green-50 text-green-700 ring-2 ring-green-500/20'
-                  : showIncorrectHighlight
-                  ? 'border-red-600 bg-red-50 text-red-700'
-                  : 'border-gray-50 hover:border-gray-200 hover:bg-gray-50'
-              } ${quizState === 'feedback' ? 'cursor-default' : 'cursor-pointer'}`}
-            >
-              <div className={`w-8 h-8 rounded-xl border flex-shrink-0 flex items-center justify-center font-bold text-xs transition-all ${
-                (quizState === 'responding' && isSelected) || showCorrectHighlight
-                  ? 'bg-blue-600 border-blue-600 text-white' 
-                  : showIncorrectHighlight
-                  ? 'bg-red-600 border-red-600 text-white'
-                  : 'bg-white border-gray-100 text-gray-400 group-hover:border-gray-200'
-              }`}>
-                {String.fromCharCode(65 + idx)}
-              </div>
-              <span className="flex-1 font-semibold text-lg">{opt}</span>
-              <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 transition-all flex items-center justify-center ${
-                showCorrectHighlight 
-                  ? 'border-green-600 bg-green-600 shadow-lg shadow-green-200' 
-                  : showIncorrectHighlight
-                  ? 'border-red-600 bg-red-600 shadow-lg shadow-red-200'
-                  : (quizState === 'responding' && isSelected)
-                  ? 'border-blue-600 bg-blue-600 shadow-lg shadow-blue-200'
-                  : 'border-gray-100'
-              }`}>
-                {showCorrectHighlight && <CheckCircle2 className="w-full h-full text-white p-1" />}
-                {showIncorrectHighlight && <XCircle className="w-full h-full text-white p-1" />}
-                {quizState === 'responding' && isSelected && <CheckCircle2 className="w-full h-full text-white p-1" />}
-              </div>
-            </button>
-          );
-        })}
+        {q.options.map((opt, idx) => (
+          <button
+            key={idx}
+            onClick={() => setSelected(idx)}
+            className={`w-full p-5 rounded-2xl text-left border-2 transition-all duration-200 flex items-center justify-center space-x-4 group h-full leading-snug cursor-pointer ${
+              selected === idx 
+                ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md transform -translate-y-0.5' 
+                : 'border-gray-50 hover:border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-xl border flex-shrink-0 flex items-center justify-center font-bold text-xs transition-all ${
+              selected === idx ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-100 text-gray-400 group-hover:border-gray-200'
+            }`}>
+              {String.fromCharCode(65 + idx)}
+            </div>
+            <span className="flex-1 font-semibold text-lg">{opt}</span>
+            <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 transition-all ${
+              selected === idx ? 'border-blue-600 bg-blue-600 shadow-lg shadow-blue-200' : 'border-gray-100'
+            }`}>
+              {selected === idx && <CheckCircle2 className="w-full h-full text-white p-1" />}
+            </div>
+          </button>
+        ))}
       </div>
 
       <button
-        onClick={quizState === 'responding' ? handleVerify : handleContinue}
+        onClick={handleNext}
         disabled={selected === null}
         className={`w-full py-5 rounded-2xl font-bold transition-all shadow-lg flex items-center justify-center space-x-2 ${
           selected !== null 
@@ -675,11 +644,7 @@ function QuizModule({ onComplete, questions, onReview }: { onComplete: () => voi
             : 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
         }`}
       >
-        <span>
-          {quizState === 'feedback' 
-            ? (currentIdx === questions.length - 1 ? "Voir les Résultats" : "Question Suivante") 
-            : (currentIdx === questions.length - 1 ? "Valider le Quiz" : "Vérifier la réponse")}
-        </span>
+        <span>{currentIdx === questions.length - 1 ? "Valider le Quiz" : "Question Suivante"}</span>
         <ChevronRight className="w-5 h-5" />
       </button>
     </div>
@@ -762,60 +727,112 @@ function SuccessForm({ onSubmit, initialUser }: { onSubmit: (info: UserInfo) => 
 
 function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingTitle: string }) {
   return (
-    <div id="certificate-print" style={{ backgroundColor: '#ffffff', color: '#111827' }} className="p-2 sm:p-4 rounded-none sm:rounded-[3rem] shadow-none sm:shadow-2xl border-0 sm:border-[30px] border-[#eff6ff] relative overflow-hidden aspect-[1.414/1] flex items-center justify-center min-h-[500px]">
-      {/* Subtle Background Pattern - Using standard blue hex */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none" 
-           style={{ backgroundImage: 'radial-gradient(#2563eb 0.5px, transparent 0.5px)', backgroundSize: '16px 16px' }} />
-      
-      {/* Decorative corners */}
-      <div className="absolute top-0 left-0 w-32 h-32 border-l-[12px] border-t-[12px] border-[#2563eb]/10 pointer-events-none" />
-      <div className="absolute top-0 right-0 w-32 h-32 border-r-[12px] border-t-[12px] border-[#2563eb]/10 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 border-l-[12px] border-b-[12px] border-[#2563eb]/10 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-32 h-32 border-r-[12px] border-b-[12px] border-[#2563eb]/10 pointer-events-none" />
-
-      {/* Main Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden">
-          <Award className="w-[80%] h-[80%] rotate-[15deg] transform translate-x-1/4 translate-y-1/4 text-[#2563eb]" />
-      </div>
-
-      <div style={{ borderColor: 'rgba(37, 99, 235, 0.05)', backgroundColor: 'rgba(255, 255, 255, 0.7)' }} className="relative z-10 text-center max-w-2xl px-6 sm:px-12 py-8 sm:py-20 border-2 border-double rounded-[2rem] backdrop-blur-md m-8 w-full shadow-[0_0_50px_rgba(37,99,235,0.03)]">
-        <div className="flex flex-col items-center mb-10">
-            <div style={{ backgroundColor: '#111827' }} className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center mb-6 shadow-2xl relative">
-                <Award style={{ color: '#ffffff' }} className="w-8 h-8 sm:w-10 sm:h-10 relative z-10" />
-                <div className="absolute inset-0 bg-[#2563eb] rounded-3xl blur-xl opacity-20" />
+    <div className="flex justify-center w-full overflow-x-auto py-8 scrollbar-hide">
+      <div 
+        id="certificate-print"
+        style={{
+          fontFamily: "'Georgia', serif",
+          width: '800px',
+          minWidth: '800px',
+          height: '550px',
+          padding: '25px',
+          backgroundColor: '#fff',
+          border: '20px solid #0A2540',
+          boxSizing: 'border-box',
+          backgroundImage: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
+          position: 'relative'
+        }}
+      >
+        <div style={{
+          border: '2px solid #D4AF37',
+          height: '100%',
+          padding: '15px 20px',
+          boxSizing: 'border-box',
+          textAlign: 'center'
+        }}>
+          <div style={{ marginTop: '45px' }}>
+            <div style={{
+              fontFamily: "'Arial', sans-serif",
+              fontSize: '11px',
+              color: '#0A2540',
+              letterSpacing: '0.5px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              lineHeight: '1.3'
+            }}>
+              Support Pédagogique pour Manipulateurs de Radiologie<br/>de l'Hôpital Mahmoud El Matri
             </div>
-            <p style={{ color: '#2563eb' }} className="font-black uppercase tracking-[0.3em] text-[10px] sm:text-xs mb-4">Certificat de Formation Clinique</p>
-            <div style={{ backgroundColor: '#f3f4f6' }} className="h-0.5 w-32 rounded-full mb-8" />
-        </div>
-        
-        <p style={{ color: '#9ca3af' }} className="text-[12px] sm:text-sm uppercase tracking-[0.2em] font-bold mb-6 italic">Ce diplôme est décerné à</p>
-        
-        <h3 style={{ color: '#111827' }} className="text-4xl sm:text-6xl font-serif font-black mb-8 tracking-tight capitalize leading-tight">
-          {info.firstName} {info.lastName}
-        </h3>
-        
-        <p style={{ color: '#6b7280' }} className="leading-relaxed max-w-lg mx-auto text-sm sm:text-lg mb-12">
-          Validation des compétences théoriques pour le module :
-          <span style={{ color: '#111827' }} className="block mt-4 font-black text-xl sm:text-3xl uppercase tracking-tighter leading-none">{trainingTitle}</span>
-          <span style={{ color: 'rgba(37, 99, 235, 0.4)' }} className="block mt-6 text-[10px] font-black uppercase tracking-widest">{info.institution}</span>
-        </p>
+            <div style={{ color: '#D4AF37', fontSize: '16px', margin: '2px 0' }}>✦ ✦ ✦</div>
+            <h1 style={{
+              color: '#0A2540',
+              fontSize: '28px',
+              margin: '5px 0',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              fontWeight: 'bold'
+            }}>Attestation de Réussite</h1>
+            <h2 style={{
+              color: '#D4AF37',
+              fontSize: '14px',
+              margin: '0 0 15px 0',
+              fontStyle: 'italic',
+              fontWeight: 'normal'
+            }}>Programme Indépendant de Formation "RF-Flash"</h2>
 
-        <div style={{ borderTopColor: '#f3f4f6' }} className="grid grid-cols-2 md:grid-cols-3 items-end justify-between mt-16 pt-10 border-t gap-8">
-          <div className="text-center md:text-left order-2 md:order-1">
-            <p style={{ color: '#d1d5db' }} className="text-[9px] font-black uppercase tracking-widest mb-2 text-center md:text-left">Délivré le</p>
-            <p style={{ color: '#111827' }} className="text-sm sm:text-base font-bold">{info.date}</p>
-          </div>
-          
-          <div className="flex flex-col items-center order-1 md:order-2 col-span-2 md:col-span-1">
-            <div className="w-16 h-16 opacity-30 mb-2">
-                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CERT-${info.firstName}-${info.lastName}`} alt="QR" className="w-full h-full grayscale" />
+            <div style={{
+              fontSize: '14px',
+              lineHeight: '1.5',
+              color: '#333',
+              margin: '15px auto',
+              maxWidth: '620px'
+            }}>
+              Il est certifié avec honneur que le/la Technicien(ne) en Imagerie Médicale<br/>
+              <div style={{
+                fontSize: '22px',
+                fontWeight: 'bold',
+                color: '#0A2540',
+                borderBottom: '2px solid #D4AF37',
+                display: 'inline-block',
+                paddingBottom: '2px',
+                margin: '5px 0',
+                fontFamily: "'Arial', sans-serif"
+              }}>
+                {info.firstName} {info.lastName}
+              </div><br/>
+              a complété avec succès le module de formation autonome et validé l'évaluation sur la <br/>
+              <strong>Radiofréquence Hépatique sous Scanner</strong>.
             </div>
-            <p style={{ color: '#d1d5db' }} className="text-[8px] font-black tracking-tighter uppercase">Authentification n° INF-PRO-2026</p>
           </div>
 
-          <div className="text-center md:text-right order-3">
-            <p style={{ color: '#111827', opacity: 0.6 }} className="font-serif italic text-2xl font-bold mb-1">C. Dubois</p>
-            <p style={{ color: '#d1d5db' }} className="text-[9px] font-black uppercase tracking-widest">Conseil Académique</p>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '45px',
+            padding: '0 40px'
+          }}>
+            <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
+              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '20px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>Nour KCHAOU</div>
+              <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>Étudiante en Imagerie Médicale<br/>et Radiothérapie</div>
+            </div>
+            <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
+              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '20px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>Wissal KHALIL</div>
+              <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>Étudiante en Imagerie Médicale<br/>et Radiothérapie</div>
+            </div>
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            bottom: '35px',
+            left: '65px',
+            fontSize: '9px',
+            color: '#777',
+            fontFamily: "'Arial', sans-serif",
+            textAlign: 'left'
+          }}>
+            <strong>Réf :</strong> RF-FLASH/2026<br/>
+            <strong>Date :</strong> {info.date}
           </div>
         </div>
       </div>
@@ -825,13 +842,10 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
           body * { visibility: hidden; }
           #certificate-print, #certificate-print * { visibility: visible; }
           #certificate-print {
-            position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
-            margin: 0; padding: 1.2cm; box-shadow: none; border: 30px solid #eff6ff;
-            display: flex; align-items: center; justify-content: center;
-            background-color: white !important;
+            position: absolute; left: 0; top: 0;
+            margin: 0;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
           }
-          #certificate-print .absolute { display: block !important; }
           @page { size: landscape; margin: 0; }
         }
       `}</style>
@@ -923,25 +937,25 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
 
   return (
     <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
-      <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10">
+      <div className="p-4 sm:p-8 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-baseline sm:items-center justify-center text-white shadow-lg p-2 sm:p-0">
             <Settings className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight leading-none">Administration</h2>
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-1.5">Gestion des ressources</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-none">Administration</h2>
+            <p className="text-gray-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest mt-1.5 line-clamp-1">Gestion des ressources</p>
           </div>
         </div>
         <button 
           onClick={onClose}
-          className="px-6 py-2.5 bg-gray-50 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors border border-gray-100"
+          className="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-50 text-gray-600 rounded-xl text-xs sm:text-sm font-bold hover:bg-gray-100 transition-colors border border-gray-100 whitespace-nowrap ml-2"
         >
           Fermer
         </button>
       </div>
 
-      <div className="flex border-b border-gray-50">
+      <div className="flex border-b border-gray-50 overflow-x-auto">
         {[
           { id: 'content', label: 'Formation', icon: BookOpen },
           { id: 'quiz', label: 'Questions', icon: FileQuestion },
@@ -950,7 +964,7 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
           <button 
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2 flex items-center justify-center space-x-2 ${activeTab === tab.id ? 'text-blue-600 border-blue-600 bg-blue-50/30' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
+            className={`flex-1 py-4 px-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2 flex items-center justify-center space-x-2 whitespace-nowrap min-w-max ${activeTab === tab.id ? 'text-blue-600 border-blue-600 bg-blue-50/30' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
           >
             <tab.icon className="w-3 h-3" />
             <span>{tab.label}</span>
@@ -958,7 +972,7 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
         ))}
       </div>
 
-      <div className="p-8 flex-1 overflow-y-auto max-h-[70vh]">
+      <div className="p-4 sm:p-8 flex-1 overflow-y-auto max-h-[70vh]">
         {activeTab === 'content' && (
           <div className="space-y-6 max-w-2xl mx-auto pb-10">
             <div className="space-y-2">
@@ -1013,27 +1027,27 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
             
             <div className="space-y-8">
               {questions.map((q, qIdx) => (
-                <div key={q.id} className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 space-y-6 relative group">
-                  <div className="absolute top-6 right-6 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all">
+                <div key={q.id} className="p-4 sm:p-6 bg-gray-50 rounded-[2rem] border border-gray-100 space-y-6 relative group mt-8 sm:mt-0">
+                  <div className="absolute -top-4 right-4 sm:top-6 sm:right-6 flex items-center space-x-1 sm:space-x-2 bg-white sm:bg-transparent rounded-xl shadow-sm sm:shadow-none border border-gray-100 sm:border-transparent p-1 sm:p-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all z-10">
                     <button 
                       onClick={() => moveQuestion(qIdx, 'up')}
                       disabled={qIdx === 0}
-                      className="p-2 text-gray-400 hover:text-blue-600 disabled:opacity-30"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 disabled:opacity-30 bg-white sm:bg-transparent rounded-md"
                     >
-                      <ArrowUp className="w-4 h-4" />
+                      <ArrowUp className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                     <button 
                       onClick={() => moveQuestion(qIdx, 'down')}
                       disabled={qIdx === questions.length - 1}
-                      className="p-2 text-gray-400 hover:text-blue-600 disabled:opacity-30"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 disabled:opacity-30 bg-white sm:bg-transparent rounded-md"
                     >
-                      <ArrowDown className="w-4 h-4" />
+                      <ArrowDown className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                     <button 
                       onClick={() => deleteQuestion(q.id)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                   
@@ -1094,35 +1108,37 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
 
             <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-4">Dernières Certifications</h3>
             {results.length > 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/50">
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Étudiant</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Institution</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Délivré le</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {results.map((res) => (
-                      <tr key={res.id} className="hover:bg-blue-50/20 transition-colors group">
-                        <td className="px-6 py-4 font-bold text-gray-900">{res.firstName} {res.lastName}</td>
-                        <td className="px-6 py-4 text-xs font-medium text-gray-500 font-mono uppercase italic">{res.institution}</td>
-                        <td className="px-6 py-4 text-xs text-gray-400">{res.date}</td>
-                        <td className="px-6 py-4 text-right">
-                          <button 
-                            onClick={() => deleteResult(res.id)}
-                            className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                            title="Supprimer la certification"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                      <tr className="bg-gray-50/50">
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Étudiant</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Institution</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Délivré le</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {results.map((res) => (
+                        <tr key={res.id} className="hover:bg-blue-50/20 transition-colors group">
+                          <td className="px-6 py-4 font-bold text-gray-900">{res.firstName} {res.lastName}</td>
+                          <td className="px-6 py-4 text-xs font-medium text-gray-500 font-mono uppercase italic">{res.institution}</td>
+                          <td className="px-6 py-4 text-xs text-gray-400">{res.date}</td>
+                          <td className="px-6 py-4 text-right">
+                            <button 
+                              onClick={() => deleteResult(res.id)}
+                              className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                              title="Supprimer la certification"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             ) : (
               <div className="text-center py-20 border-2 border-dashed border-gray-100 rounded-3xl">
