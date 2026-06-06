@@ -967,21 +967,20 @@ function QuestionEditor({
     }
   }, [q, isDirty]);
 
-  const debouncedSave = React.useMemo(
-    () => debounce(async (id: string, updates: Partial<Question>) => {
+  const debouncedSave = React.useRef(
+    debounce(async (id: string, updates: Partial<Question>, saveFn: Function) => {
       try {
-        await onSave(id, updates);
+        await saveFn(id, updates);
       } finally {
         setIsDirty(false);
       }
-    }, 1000),
-    [onSave]
-  );
+    }, 1000)
+  ).current;
 
   const updateField = (updates: Partial<Question>) => {
     setIsDirty(true);
     setLocalQ(prev => ({ ...prev, ...updates }));
-    debouncedSave(q.id, updates);
+    debouncedSave(q.id, updates, onSave);
   };
 
   return (
@@ -1295,28 +1294,35 @@ function AdminPanel({ training, questions, onClose }: { training: TrainingData, 
                               newBlocks[idx] = { ...block, value: e.target.value };
                               setTData({...tData, contentBlocks: newBlocks});
                             }}
-                            placeholder={block.type === 'image' ? "URL de l'image ou bien uploader un fichier..." : "URL de la vidéo ou bien uploader un fichier..."}
+                            placeholder={block.type === 'image' ? "URL de l'image ou bien uploader un fichier..." : "Ex: /videos/ma_video.mp4 (Upload dans le dossier public/videos)"}
                           />
-                          <div className="relative">
-                            <input
-                              type="file"
-                              accept={block.type === 'image' ? "image/*" : "video/*"}
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) handleFileUpload(file, block.id, idx);
-                              }}
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            />
-                            <button className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-sm whitespace-nowrap transition-colors flex items-center">
-                              {uploadProgress[block.id] !== undefined ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              ) : (
-                                <FileDown className="w-4 h-4 mr-2" />
-                              )}
-                              Upload
-                            </button>
-                          </div>
+                          {block.type === 'image' && (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleFileUpload(file, block.id, idx);
+                                }}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              />
+                              <button className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-sm whitespace-nowrap transition-colors flex items-center">
+                                {uploadProgress[block.id] !== undefined ? (
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                  <FileDown className="w-4 h-4 mr-2" />
+                                )}
+                                Upload
+                              </button>
+                            </div>
+                          )}
                         </div>
+                        {block.type === 'video' && (
+                          <p className="text-xs text-gray-500 font-medium px-1">
+                            Pour les vidéos, utilisez l'explorateur de fichiers à gauche pour uploader vos fichiers dans <code className="bg-gray-100 px-1 py-0.5 rounded text-blue-600">public/videos/</code> puis saisissez le chemin <code className="bg-gray-100 px-1 py-0.5 rounded">/videos/votre_fichier.mp4</code>.
+                          </p>
+                        )}
                         {uploadProgress[block.id] !== undefined && (
                           <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                             <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${uploadProgress[block.id]}%` }}></div>
