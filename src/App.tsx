@@ -815,9 +815,11 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
             padding: '10px 20px',
             boxSizing: 'border-box',
             textAlign: 'center',
-            position: 'relative'
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            <div style={{ marginTop: '10px' }}>
+            <div style={{ flex: 1, marginTop: '5px' }}>
               <div style={{
                 fontFamily: "'Arial', sans-serif",
                 fontSize: '11.5px',
@@ -845,7 +847,7 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
               <h2 style={{
                 color: '#d4af37',
                 fontSize: '16px',
-                margin: '0 0 25px 0',
+                margin: '0 0 20px 0',
                 fontStyle: 'italic',
                 fontWeight: 'normal',
                 fontFamily: "'Georgia', serif"
@@ -855,7 +857,7 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
                 fontSize: '15px',
                 lineHeight: '1.8',
                 color: '#333',
-                margin: '10px auto',
+                margin: '5px auto',
                 maxWidth: '650px',
                 fontFamily: "'Georgia', serif"
               }}>
@@ -865,7 +867,7 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
                   fontWeight: 'bold',
                   color: '#1b365d',
                   display: 'block',
-                  margin: '12px 0 10px 0',
+                  margin: '10px 0',
                   fontFamily: "'Georgia', serif",
                   letterSpacing: '0.5px'
                 }}>
@@ -878,14 +880,16 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
 
             <div style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '45px',
-              padding: '0 40px'
+              justifyContent: 'center',
+              gap: '120px',
+              padding: '0 20px',
+              marginTop: 'auto',
+              marginBottom: '35px'
             }}>
-              <div style={{ width: '250px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
+              <div style={{ width: '260px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
                 <div style={{ fontStyle: 'italic', color: '#c5a059', fontSize: '11px', marginBottom: '2px' }}>[Scan Signature]</div>
-                <div style={{ height: '40px', width: '100%', position: 'relative', overflow: 'visible' }}>
-                  <svg viewBox="0 0 150 50" style={{ height: '110%', position: 'absolute', top: '-5px', left: '-15px', opacity: 0.85 }}>
+                <div style={{ height: '50px', width: '100%', position: 'relative', overflow: 'visible' }}>
+                  <svg viewBox="0 0 150 50" style={{ height: '110%', position: 'absolute', top: '-5px', left: '10px', opacity: 0.85 }}>
                     <path d="M40,35 C30,15 45,5 50,35 C65,15 70,30 80,30 C85,30 90,20 95,30 C100,20 105,30 115,30 M30,30 L55,25 M45,45 C50,45 60,40 70,40 C80,45 90,40 100,45" fill="none" stroke="#1b365d" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
@@ -895,10 +899,10 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
                 </div>
               </div>
 
-              <div style={{ width: '250px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
+              <div style={{ width: '260px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
                 <div style={{ fontStyle: 'italic', color: '#c5a059', fontSize: '11px', marginBottom: '2px' }}>[Scan Signature]</div>
-                <div style={{ height: '40px', width: '100%', position: 'relative', overflow: 'visible' }}>
-                  <svg viewBox="0 0 150 50" style={{ height: '115%', position: 'absolute', top: '-8px', left: '-10px', opacity: 0.85 }}>
+                <div style={{ height: '50px', width: '100%', position: 'relative', overflow: 'visible' }}>
+                  <svg viewBox="0 0 150 50" style={{ height: '115%', position: 'absolute', top: '-8px', left: '20px', opacity: 0.85 }}>
                     <path d="M35,10 L40,40 M40,30 L50,15 C60,25 65,15 70,30 C75,10 80,30 85,40 C95,15 100,5 105,30 C110,20 115,10 120,25 L120,40 M110,40 L130,40 M80,25 L90,25" fill="none" stroke="#1b365d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
@@ -911,9 +915,9 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
 
             <div style={{
               position: 'absolute',
-              bottom: '15px',
+              bottom: '10px',
               left: '20px',
-              fontSize: '9.5px',
+              fontSize: '10px',
               color: '#555',
               fontFamily: "'Arial', sans-serif",
               textAlign: 'left',
