@@ -791,142 +791,134 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
       <div 
         id="certificate-print"
         style={{
-          fontFamily: "'Georgia', serif",
           width: '800px',
-          minWidth: '800px',
-          height: '560px',
-          padding: '12px',
-          backgroundColor: '#f4f4f4',
+          height: '550px',
+          padding: '25px',
+          background: '#fff',
+          border: '20px solid #0A2540',
+          boxShadow: '0 0 20px rgba(0,0,0,0.2)',
           boxSizing: 'border-box',
-          position: 'relative'
+          backgroundImage: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
+          position: 'relative',
+          fontFamily: "'Georgia', serif",
+          margin: '0 auto'
         }}
       >
         <div style={{
-          backgroundColor: '#fdfdfd',
-          border: '12px solid #1b365d',
-          boxShadow: 'inset 0 0 0 6px #fdfdfd, inset 0 0 0 8px #d4af37',
-          padding: '24px',
-          width: '100%',
+          border: '2px solid #D4AF37',
           height: '100%',
+          padding: '15px 20px',
           boxSizing: 'border-box',
+          textAlign: 'center'
         }}>
-          <div style={{
-            height: '100%',
-            padding: '10px 20px',
-            boxSizing: 'border-box',
-            textAlign: 'center',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <div style={{ flex: 1, marginTop: '5px' }}>
-              <div style={{
-                fontFamily: "'Arial', sans-serif",
-                fontSize: '11.5px',
-                color: '#1b365d',
-                letterSpacing: '0.5px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                lineHeight: '1.4'
-              }}>
-                Support Pédagogique pour Manipulateurs de Radiologie<br/>de l'Hôpital Mahmoud El Matri
-              </div>
-              
-              <div style={{ color: '#d4af37', fontSize: '18px', margin: '8px 0', letterSpacing: '4px' }}>★ ★ ★</div>
-              
-              <h1 style={{
-                color: '#1b365d',
-                fontSize: '34px',
-                margin: '10px 0 5px 0',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                fontWeight: 'bold',
-                fontFamily: "'Georgia', serif"
-              }}>Attestation de Réussite</h1>
-              
-              <h2 style={{
-                color: '#d4af37',
-                fontSize: '16px',
-                margin: '0 0 20px 0',
-                fontStyle: 'italic',
-                fontWeight: 'normal',
-                fontFamily: "'Georgia', serif"
-              }}>Programme Indépendant de Formation "RF-Flash"</h2>
-
-              <div style={{
-                fontSize: '15px',
-                lineHeight: '1.8',
-                color: '#333',
-                margin: '5px auto',
-                maxWidth: '650px',
-                fontFamily: "'Georgia', serif"
-              }}>
-                Il est certifié avec honneur que le/la Technicien(ne) en Imagerie Médicale<br/>
-                <div style={{
-                  fontSize: '26px',
-                  fontWeight: 'bold',
-                  color: '#1b365d',
-                  display: 'block',
-                  margin: '10px 0',
-                  fontFamily: "'Georgia', serif",
-                  letterSpacing: '0.5px'
-                }}>
-                  {info.firstName} {info.lastName}
-                </div>
-                a complété avec succès le module de formation autonome et validé l'évaluation sur la<br/>
-                <strong style={{ color: '#333', fontSize: '16px' }}>Radiofréquence Hépatique sous Scanner.</strong>
-              </div>
-            </div>
-
+          
+          <div style={{ marginTop: '45px' }}>
             <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '120px',
-              padding: '0 20px',
-              marginTop: 'auto',
-              marginBottom: '35px'
-            }}>
-              <div style={{ width: '260px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
-                <div style={{ fontStyle: 'italic', color: '#c5a059', fontSize: '11px', marginBottom: '2px' }}>[Scan Signature]</div>
-                <div style={{ height: '50px', width: '100%', position: 'relative', overflow: 'visible' }}>
-                  <svg viewBox="0 0 150 50" style={{ height: '110%', position: 'absolute', top: '-5px', left: '10px', opacity: 0.85 }}>
-                    <path d="M40,35 C30,15 45,5 50,35 C65,15 70,30 80,30 C85,30 90,20 95,30 C100,20 105,30 115,30 M30,30 L55,25 M45,45 C50,45 60,40 70,40 C80,45 90,40 100,45" fill="none" stroke="#1b365d" strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div style={{ borderTop: '1px solid #1b365d', paddingTop: '6px' }}>
-                  <span style={{ fontWeight: 'bold', color: '#1b365d', fontSize: '13px' }}>Nour KCHAOU</span><br/>
-                  <span style={{ fontSize: '11px', color: '#555', fontStyle: 'italic', lineHeight: '1.4' }}>Étudiante en Imagerie Médicale<br/>et Radiothérapie</span>
-                </div>
-              </div>
-
-              <div style={{ width: '260px', textAlign: 'left', fontSize: '12px', color: '#333' }}>
-                <div style={{ fontStyle: 'italic', color: '#c5a059', fontSize: '11px', marginBottom: '2px' }}>[Scan Signature]</div>
-                <div style={{ height: '50px', width: '100%', position: 'relative', overflow: 'visible' }}>
-                  <svg viewBox="0 0 150 50" style={{ height: '115%', position: 'absolute', top: '-8px', left: '20px', opacity: 0.85 }}>
-                    <path d="M35,10 L40,40 M40,30 L50,15 C60,25 65,15 70,30 C75,10 80,30 85,40 C95,15 100,5 105,30 C110,20 115,10 120,25 L120,40 M110,40 L130,40 M80,25 L90,25" fill="none" stroke="#1b365d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div style={{ borderTop: '1px solid #1b365d', paddingTop: '6px' }}>
-                  <span style={{ fontWeight: 'bold', color: '#1b365d', fontSize: '13px' }}>Wissal KHALIL</span><br/>
-                  <span style={{ fontSize: '11px', color: '#555', fontStyle: 'italic', lineHeight: '1.4' }}>Étudiante en Imagerie Médicale<br/>et Radiothérapie</span>
-                </div>
-              </div>
-            </div>
-
-            <div style={{
-              position: 'absolute',
-              bottom: '10px',
-              left: '20px',
-              fontSize: '10px',
-              color: '#555',
               fontFamily: "'Arial', sans-serif",
-              textAlign: 'left',
-              lineHeight: '1.4'
+              fontSize: '11px',
+              color: '#0A2540',
+              letterSpacing: '0.5px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              lineHeight: '1.3'
             }}>
-              <strong style={{ color: '#333' }}>Réf :</strong> RF-FLASH/2026<br/>
-              <strong style={{ color: '#333' }}>Date :</strong> {info.date || new Date().toLocaleDateString('fr-FR')}
+              Support Pédagogique pour Manipulateurs de Radiologie<br/>de l'Hôpital Mahmoud El Matri
+            </div>
+            
+            <div style={{
+              color: '#D4AF37',
+              fontSize: '16px',
+              margin: '2px 0'
+            }}>✦ ✦ ✦</div>
+            
+            <h1 style={{
+              color: '#0A2540',
+              fontSize: '28px',
+              margin: '5px 0',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              fontWeight: 'bold'
+            }}>Attestation de Réussite</h1>
+            
+            <h2 style={{
+              color: '#D4AF37',
+              fontSize: '14px',
+              margin: '0 0 15px 0',
+              fontStyle: 'italic',
+              fontWeight: 'normal'
+            }}>Programme Indépendant de Formation "RF-Flash"</h2>
+
+            <div style={{
+              fontSize: '14px',
+              lineHeight: '1.5',
+              color: '#333',
+              margin: '15px auto',
+              maxWidth: '620px'
+            }}>
+              Il est certifié avec honneur que le/la Technicien(ne) en Imagerie Médicale<br/>
+              <div style={{
+                fontSize: '22px',
+                fontWeight: 'bold',
+                color: '#0A2540',
+                borderBottom: '2px solid #D4AF37',
+                display: 'inline-block',
+                paddingBottom: '2px',
+                margin: '5px 0',
+                fontFamily: "'Arial', sans-serif"
+              }}>
+                {info.firstName} {info.lastName}
+              </div><br/>
+              a complété avec succès le module de formation autonome et validé l'évaluation sur la <br/>
+              <strong>Radiofréquence Hépatique sous Scanner.</strong>
             </div>
           </div>
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '45px',
+            padding: '0 40px'
+          }}>
+            <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
+              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
+              <div style={{ height: '60px', marginTop: '5px', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                <img src="/signatures/nour.jpg" alt="Signature Nour KCHAOU" style={{ height: '100%', objectFit: 'contain' }} className="mix-blend-multiply" />
+              </div>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '5px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
+                Nour KCHAOU
+              </div>
+              <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>
+                Étudiante en Imagerie Médicale<br/>et Radiothérapie
+              </div>
+            </div>
+            
+            <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
+              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
+              <div style={{ height: '60px', marginTop: '5px', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+                <img src="/signatures/wissal.jpg" alt="Signature Wissal KHALIL" style={{ height: '100%', objectFit: 'contain' }} className="mix-blend-multiply" />
+              </div>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '5px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
+                Wissal KHALIL
+              </div>
+              <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>
+                Étudiante en Imagerie Médicale<br/>et Radiothérapie
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            bottom: '35px',
+            left: '65px',
+            fontSize: '9px',
+            color: '#777',
+            fontFamily: "'Arial', sans-serif",
+            textAlign: 'left'
+          }}>
+            <strong>Réf :</strong> RF-FLASH/2026<br/>
+            <strong>Date :</strong> {info.date || new Date().toLocaleDateString('fr-FR')}
+          </div>
+
         </div>
       </div>
       
