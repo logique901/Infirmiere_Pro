@@ -809,10 +809,11 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
           height: '100%',
           padding: '15px 20px',
           boxSizing: 'border-box',
-          textAlign: 'center'
+          textAlign: 'center',
+          position: 'relative'
         }}>
           
-          <div style={{ marginTop: '45px' }}>
+          <div style={{ marginTop: '20px' }}>
             <div style={{
               fontFamily: "'Arial', sans-serif",
               fontSize: '11px',
@@ -876,15 +877,11 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            marginTop: '45px',
+            marginTop: '35px',
             padding: '0 40px'
           }}>
             <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
-              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
-              <div style={{ height: '60px', marginTop: '5px', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-                <img src="/signatures/nour.jpg" alt="Signature Nour KCHAOU" style={{ height: '100%', objectFit: 'contain' }} className="mix-blend-multiply" />
-              </div>
-              <div style={{ borderTop: '1px solid #0A2540', marginTop: '5px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '15px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
                 Nour KCHAOU
               </div>
               <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>
@@ -893,11 +890,7 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
             </div>
             
             <div style={{ width: '240px', textAlign: 'center', fontSize: '11px', color: '#333' }}>
-              <div style={{ fontStyle: 'italic', color: '#b59210', fontSize: '10px' }}>[Scan Signature]</div>
-              <div style={{ height: '60px', marginTop: '5px', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-                <img src="/signatures/wissal.jpg" alt="Signature Wissal KHALIL" style={{ height: '100%', objectFit: 'contain' }} className="mix-blend-multiply" />
-              </div>
-              <div style={{ borderTop: '1px solid #0A2540', marginTop: '5px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
+              <div style={{ borderTop: '1px solid #0A2540', marginTop: '15px', paddingTop: '4px', fontWeight: 'bold', color: '#0A2540' }}>
                 Wissal KHALIL
               </div>
               <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic', marginTop: '1px', lineHeight: '1.2' }}>
@@ -908,8 +901,8 @@ function CertificateDisplay({ info, trainingTitle }: { info: UserInfo, trainingT
 
           <div style={{
             position: 'absolute',
-            bottom: '35px',
-            left: '65px',
+            bottom: '15px',
+            left: '20px',
             fontSize: '9px',
             color: '#777',
             fontFamily: "'Arial', sans-serif",
